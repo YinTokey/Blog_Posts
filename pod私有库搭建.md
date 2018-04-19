@@ -28,7 +28,7 @@ git remote add origin https://github.com/YinTokey/UserModule.git
 ```
 echo MIT>LICENSE
 ```
-**5.** 继续在该目录下，执行下面命令创建 podspec (UserLogin为库的名称)
+**5.** 继续在该目录下，执行下面命令创建 podspec (UserModule为库的名称)
 ```
 pod spec create UserModule
 ```
@@ -57,8 +57,69 @@ git commit -m "log"  #提交描述
 git push origin master #推送仓库
 git tag -m "vsersion_0.1.0" 0.1.0 #其中 version_0.1.1是标签描述， 0.1.0 是标签名，标签名必须和 .podspec 文件里的version一致。
 git push --tags
-git repo add UserModule-master https://github.com/YinTokey/UserModule.git #UserModule-master 为本地仓库名，后面第地址为 pod 远程仓库地址
+pod repo add UserModule-master https://github.com/YinTokey/UserModule.git #UserModule-master 为本地仓库名，后面第地址为 pod 远程仓库地址
 pod repo push UserModule-master UserModule.podspec #UserModule-master UserModule.podspec 自行替换
 ```
 **9.**到此，私有库建立基本完成。接下来是引用。在某个需要引用该私有库的项目的 Podfile 文件顶部，加入下面两行
+```
+source 'https://github.com/CocoaPods/Specs.git' #官方仓库地址
+source 'https://github.com/YinTokey/UserModule.git' #自己的仓库地址
+```
+然后 Pod 引入
+```
+pod 'UserModule', :git => 'https://github.com/YinTokey/UserModule.git'
+```
+执行 pod install，安装完成后，即可使用。
+
+**10.** 如果在 `import XXX` 时出现`Cannot load underlying module for 'XXX'` 时，参照[解决方法](https://blog.csdn.net/yissan/article/details/75226544)
+## 私有库的更新与私有库的依赖
+下面对 `UserModule`进行代码修改。
+
+**1.**根据上面第**9**步在 UserModule-master 项目中加入 Podfile，并执行 pod install 安装。其中 `Egen`是另一个私有库，地址为 
+```
+https://github.com/YinTokey/Egen.git
+```
+**2.** 对 `LoginModule.swift` 进行如下修改，让它依赖另一个私有库`Egen`，还有共有库 `Alamofire`
+
+```
+import Foundation
+import Alamofire
+import Egen
+```
+这样一来，仓库的项目结构，变成这样
+![](https://ws2.sinaimg.cn/large/006tKfTcgy1fqhmcmrl1lj30780dv3zl.jpg)
+
+**3.** 修改完后，在对.podspec文件里面的版本进行修改，并添加其他库的依赖。
+![](https://ws2.sinaimg.cn/large/006tKfTcgy1fqhmheu7mdj30hk07qgmd.jpg)
+
+**4.** 检查 .podspec 文件，因为引用了私有库，所以语句如下
+```
+pod lib lint --sources=https://github.com/YinTokey/Egen.git,https://github.com/CocoaPods/Specs.git
+```
+如果依赖多个私有库，则接后面，逗号隔开。`Alamofire`是公有库，就不需要了。
+
+**5.** 执行下面这一串，将改动和 tag 推上去。
+```
+git add 修改的文件
+git commit -m "本次提交的描述"
+git push origin master #如果执行时出现错误，根据提示使用 git pull 拉取代码
+git tag -m "标签描述" 标签名
+git push --tags
+```
+
+**6.** 把本地的Sepc更新到远程仓库
+```
+pod repo push 本地仓库名 xxx.podspec --sources=依赖的私有库地址,,https://github.com/CocoaPods/Specs.git
+
+//比如
+pod repo push UserModule-master UserModule.podspec --sources=https://github.com/YinTokey/Egen.git,https://github.com/CocoaPods/Specs.git
+
+```
+**7.** 完成后，在其他项目里，就是使用 pod 指令来更新这个库了。如果还是下载之前的版本，删除Podfile.lock文件后，再执行pod install。
+
+**8.**如果私有pod并没有依赖其他私有pod，那么第**4**和第**6**两步，就不需要在命令后面加
+```
+--sources=依赖的私有库地址,,https://github.com/CocoaPods/Specs.git
+```
+
 
