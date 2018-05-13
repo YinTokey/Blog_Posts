@@ -1,4 +1,4 @@
-## Xcode配置
+##1. Xcode配置
 最新ffmpeg版本是4.0，从[这里](https://github.com/kewlbear/FFmpeg-iOS-build-script)下载脚本，用于将ffmpeg编译成能在Xcode执行的静态库。根据文档，执行脚本。等待5~10分钟，编译完成后会在`FFmpeg-iOS-build-script`目录下面生成一个文件夹，该文件夹就是编译产物，可以将其拖入Xcode项目中使用。
 
 这个系列着重于介绍ffmpeg的工作过程，关于ffmpeg的编译问题可自行研究。下面将直接使用编译好的静态库。
@@ -7,7 +7,7 @@
 调用`av_register_all`的时候，出现报错，可以参考 https://www.jianshu.com/p/99ef8cb7cc25
 一般是在 .m文件里调用av_register_all函数才会出现这个问题，如果在 .c文件里调用不会报错。
 
-## 音视频转封装
+##2. 音视频转封装
 (如果输入源来自网络而非本地文件，则需要调用 `avformat_network_init();` )
 
 下面在Xcode中使用ffmpeg来实现视频文件的转封装，即格式转换。
