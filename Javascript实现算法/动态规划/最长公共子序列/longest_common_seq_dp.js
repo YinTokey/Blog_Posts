@@ -59,7 +59,7 @@ function findValue(input1,input2,n1,n2,T){
 
 //两个序列，长度不一定相等, 从计算表格考虑，把input1和input2首位都补一个用于占位的空字符串
 var input2 = ["","a","b","c","a","d","f"],
-	input1 = ["","a","c","b","a","e","d"],
+	input1 = ["","a","c","b","a","d"],
 	n1 = input1.length,
 	n2 = input2.length;
 
